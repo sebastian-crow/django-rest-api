@@ -1,0 +1,101 @@
+PREPARATION:
+
+1. First have the lasted version of python.
+2. The lasted version of pip.
+3. Install pipenv or venv.
+4. Install the lasted version of Django
+5. Install rest_framework using pip3.
+
+
+
+1. Install Django REST framework.
+	- pipenv install djangorestframework
+
+2. To create a Django App, first create a project, next create a Django app.
+	- django-admin startproject 'projectname'
+	- django-admin startapp 'appname'
+
+3. Go ahead into the project settings and register the app in 'INSTALLED_APPS'. If you skip this Django won't recognize the app.
+	- /projectname/projectname/settings.py
+	- INSTALLED_APPS = [
+		'.....',
+		'.....',
+		'.....',
+		'.....',
+		'appname',
+		'rest_framework'
+	] 
+
+4. Register the App URLs. Go ahead into the urls.py project folder and register the urls.
+	- urlpatterns = [
+		path('admin/', admin.site.urls),
+		path('', include('appname.urls')),
+	]
+
+5. Create a view por the API. Create a dummy view in the app's views.py file. Import the response object and @apiview decorator from Django
+REST Framework. (Response helps return serialized data in JSON format while @apiview displays the API.
+	- rest_framework.response import Response
+	- rest_framework.decorators import api_view
+	- @api_view(['GET'])
+	  def getSomething(request):
+		return Response()
+
+6. Create a URL path for the App. Create a URL path for the API view you created. This endpoint displays the 'appname' data. Here you have to
+create a urls.py file in the app folder.
+	- urlpatterns = [
+		path('', views.getSomething),
+		path('post/', views.postSomething)
+	]
+
+7. Create the data model. Create a class model and import the django.db models before.
+	- from django.db import models.
+	- Class 'ClassName'(models.Model):
+		name= models.CharField(max_length=200) # Set the data type properly and its longitude.
+		description=models.CharField(max_length=500)
+
+8. Register the models in admin.py file in app's folder.
+	- from .models import Model
+	- admin.site.register('ModelName')
+
+9. Make the migrations. This will create the tables, will turn our model to tables into the database.
+	- python manage.py makemigrations 'appname'
+	- python manage.py migrate.
+
+10. Create the superuser.
+	- python manage.py createsuperuser - ( Pass: proofofconcept123)
+
+11. Serialize the model to receive and handle the data as a JSON format.
+	- import the serializers from the Django REST framework. -> from rest_framework import serializers
+	- import the models. -> from .models import 'ModelName'
+	- create the serializer class like this ->
+		class 'ModelNameSerilizer'(serializers.ModelSerializer):
+			class Meta:
+				model = 'ModelName'
+				fields=('name', 'description') # As many as you want.
+	
+12. Update the view importing this new serializer class to response data as JSON format.
+	- import models -> from .models import 'ModelName'
+	- import serializer -> from .serializer import 'ModelNameSerializer'
+	- @api_view(['GET'])
+	  def getSomething(request):
+		something = 'ModelName'.objects.all()
+		serializer = 'ModelNameSerilizer'(something, many=True)
+		return Response(serializer.data)
+	- add data with POST method as follows.
+	- @api_view(['POST'])
+	  def postSomething(request):
+		serializer = 'ModelNameSerializer'(data=request.data)
+		if serializer.is_valid():
+			serializer.save()
+		return Response(serializer.data)
+
+__________________________________________________
+
+Sources:
+
+https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/skeleton_website
+https://codinggear.blog/django-include-urls/
+https://www.django-rest-framework.org/api-guide/views/
+https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Admin_site#:~:text=To%20login%20to%20the%20site,%27ve%20entered%20your%20details).
+https://www.django-rest-framework.org
+https://www.makeuseof.com/django-rest-api-create/
